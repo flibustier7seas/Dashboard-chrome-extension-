@@ -5,27 +5,24 @@
 		this.setFilterIndex = setFilterIndex;
         
         this.statisticsViewModel = ko.observable();
-
+		
+		
         this.list = ko.observableArray();
 
         this.load = function () {
             repositories.forEach(function (repository) {
                 loader.getPullRequests(repository).then(function (data) {
-                    ko.utils.arrayPushAll(self.list, data);
-                });
-            });
+                    ko.utils.arrayPushAll(this.list, data);
+                }.bind(this));
+            }.bind(this));
         };
         this.load();
-
-        this.add = function (item) {
-            self.list.push(item);
-        };
 
         this.headers = [
             { title: ""/*tr.header_Status*/, sortPropertyName: 'minVote', status: ko.observable(0), isFilter: false },
             { title: tr.header_Title, sortPropertyName: 'title', status: ko.observable(0),isFilter: true },
             { title: tr.header_Repository, sortPropertyName: 'repositoryName', status: ko.observable(0),isFilter: true },
-            //{ title: tr.header_Author, sortPropertyName: 'createdByDisplayName',status: ko.observable(0),isFilter = true },
+            //{ title: tr.header_Author, sortPropertyName: 'createdByDisplayName',status: ko.observable(0),isFilter: true },
             { title: tr.header_CreationDate, sortPropertyName: 'creationDate', status: ko.observable(0),isFilter: false },
             { title: tr.header_Updated, sortPropertyName: 'update', status: ko.observable(0),isFilter: false },
             { title: tr.header_StatusIssue, sortPropertyName: 'statusName', status: ko.observable(0),isFilter: true },
@@ -41,7 +38,7 @@
         };
 
         ///NOTE: Сортировка
-        this.sortHeader = self.headers[0];
+        this.sortHeader = this.headers[0];
 
         this.sort = function (data) {
             if (data.status() !== 0) {
@@ -66,32 +63,45 @@
             self.list.sort(compare);
         };
 
-        ///NOTE: Фильтрация
-        ///NOTE: Фильтры по кнопке
+        //NOTE: Фильтрация
+        //NOTE: Фильтры по кнопке
         this.filters = [
-            { title: tr.filter_ShowAll, filter: null },
-            { title: tr.filter_StatusNoVote, filter: function (item) { return item.titleMinVote() == 'No vote'; } },
-            { title: tr.filter_StatusYes, filter: function (item) { return item.titleMinVote() == 'Yes'; } },
-            { title: tr.filter_StatusNo, filter: function (item) { return item.titleMinVote() == 'No'; } },
-            { title: tr.filter_MyPullRequest, filter: function (item) { 
+            { title: tr.filter_ShowAll, isActive: ko.observable(false), filter: null },
+            { title: tr.filter_StatusNoVote, isActive: ko.observable(false), filter: function (item) 
+				{ 
+					return item.titleMinVote() == 'No vote'; 
+				} 
+			},
+            { title: tr.filter_StatusYes, isActive: ko.observable(false), filter: function (item) { return item.titleMinVote() == 'Yes'; } },
+            { title: tr.filter_StatusNo, isActive: ko.observable(false), filter: function (item) { return item.titleMinVote() == 'No'; } },
+            { title: tr.filter_MyPullRequest, isActive: ko.observable(false), filter: function (item) { 
 					return item.createdByLogin().toLowerCase() == userLogin.toLowerCase(); 
 				} 
 			},
             {
-                title: tr.filter_MyReview, filter: function (item) {
+                title: tr.filter_MyReview, isActive: ko.observable(false), filter: function (item) {
                     return item.reviewers().filter(function (reviewer) {
                         return reviewer.login.toLowerCase() == userLogin.toLowerCase();
                     }).length > 0;
                 }
             }
         ];
-        this.activeFilter = ko.observable(self.filters[defaultFilter].filter);
+				
+		defaultFilter = defaultFilter || 0;
+		this.filters[defaultFilter].isActive(true);
+		this.activeFilter = ko.observable(this.filters[defaultFilter]);
+		
         this.setActiveFilter = function (model) {
-			self.setFilterIndex(self.filters.indexOf(model));
-            self.activeFilter(model.filter);
-        };
+			this.activeFilter.peek().isActive(false);
+			
+			//NOTE: запоминаем выбранный фильтр в storage			
+			this.setFilterIndex(self.filters.indexOf(model));
+			
+			model.isActive(true);
+            this.activeFilter(model);
+        }.bind(this);
 
-        ///NOTE: Фильтр по введенному тексту
+        //NOTE: Фильтр по введенному тексту
         this.textForFilters = ko.observable("");
         this.propertyForFilters = ko.observable();
 
@@ -100,8 +110,8 @@
 
             var result;
 
-            if (self.activeFilter()) {
-                result = self.list().filter(self.activeFilter());
+            if (self.activeFilter().filter) {
+                result = self.list().filter(self.activeFilter().filter);
             } else {
                 result = self.list();
             }

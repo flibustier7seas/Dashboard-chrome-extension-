@@ -17,7 +17,7 @@
                     return this.repository(repositoryId) + "/commits/" + commitId;
                 },
                 commits: function (repositoryId) {
-                    return this.repository(repositoryId) + "/commitsBatch?$top=10";
+                    return this.repository(repositoryId) + "/commitsBatch?api-version=1.0&$top=10";
                 },
                 reviewers: function (repositoryId, pullRequestId) {
                     return this.pullRequest(repositoryId, pullRequestId) + "/reviewers";
@@ -37,23 +37,6 @@
                             );
                         });
                     });
-                    //$.ajax({
-                    //    url: commands.repositories,
-                    //    xhrFields: {
-                    //        withCredentials: true
-                    //    },
-                    //    crossDomain: true,
-                    //}).then(function (data) {
-                    //    return $.map(data.value || [], function (item) {
-                    //        return new repositoryModel(
-                    //            item.id,
-                    //            item.name,
-                    //            item.remoteUrl,
-                    //            item.project.name,
-                    //            item.defaultBranch
-                    //        );
-                    //    });
-                    //});
 
                 },
                 getPullRequests: function (repository) {
@@ -99,7 +82,13 @@
                             "version": sourceRefName
                         }
                     }
-                    return $.post(commands.commits(repositoryId), between).then(function (data) {
+                    return $.ajax({
+						type: "POST",
+						url: commands.commits(repositoryId),
+						contentType: "application/json; charset=utf-8",
+						data: between
+					})
+					.then(function (data) {
                         return $.map(data.value || [], function (item) {
                             return new commitModel(item.commitId, item.committer.date, utils.dateToText(item.committer.date), item.comment);
                         });
