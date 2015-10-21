@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Dashboard",
+  "version": "0.1",
+  
+  "description": "Information on PullRequests in one place",
+  
+  "permissions": [
+	"http://*/",
+	"https://*/",
+	"storage",
+	"tabs"
+  ],
+  "browser_action": {
+      "default_title": "Dashboard",
+      "default_icon": "icon.png"
+  },
+  "background": {
+    "scripts": ["scripts/background.js"]
+  },
+  
+  "options_page": "options/options.html",
+  
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

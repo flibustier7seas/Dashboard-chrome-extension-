@@ -1,0 +1,186 @@
+﻿<script type="text/html" id="pullRequestsView">   
+    <div class="row">
+        <div class="btn-group" data-toggle="buttons" data-bind="foreach: filters">
+            <label class="btn btn-primary" data-bind="click: $parent.setActiveFilter">
+                <input type="radio" name="options" />
+                <span data-bind="text: title"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-6">
+		
+		    <select class="col-md-2 form-control" data-bind="value: propertyForFilters, foreach: headers">
+				       <!-- ko if: isFilter -->        
+							<option data-bind="value : sortPropertyName, text : title "></option>
+					   <!-- /ko -->
+			</select>			
+            <!-- <select class="col-md-2 form-control" data-bind="options: headers, value: propertyForFilters, optionsText: 'title', optionsValue: 'sortPropertyName', optionsCaption: 'Выберите столбец для фильтрации'"></select> -->
+        </div>
+        <div class="col-xs-6">
+            <input class="col-md-3 form-control" placeholder="Введите текст" type="text" data-bind="textInput: textForFilters" />
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-hover">
+            <thead>
+                <tr class="text-info" data-bind="foreach: headers">
+                    <th class="thtop" data-bind="click: function (data) { $parent.sort(data) }">
+                        <span data-bind="text: title"></span>
+                    </th>
+					<th class="thtop" data-bind="click: function (data) { $parent.sort(data) }">
+                        <span class="floatRigth glyphicon glyphicon-sort text-muted " data-bind="visible: status() == 0"></span>
+                        <span class="floatRigth glyphicon glyphicon-sort-by-attributes" data-bind="visible: status() == 1"></span>
+                        <span class="floatRigth glyphicon glyphicon-sort-by-attributes-alt" data-bind="visible: status() == -1"></span>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody data-bind="foreach: pullRequests">
+                <tr class="text-left" data-toggle="modal" data-target="#myModal" data-bind="click: $parent.setPullRequest">
+                    <td colspan = "2" data-bind="attr: { 'title': titleMinVote }">
+                        <span class="glyphicon glyphicon-ok-sign text-success" data-bind="visible: minVote() == 10"></span>
+                        <span class="glyphicon glyphicon-remove-sign text-danger" data-bind="visible: minVote() == -10"></span>
+                        <span class="glyphicon glyphicon-question-sign text-info" data-bind="visible: minVote() == 0"></span>
+                    </td>
+                    <td colspan = "2" class="col-md-6">
+                        <a class="text-primary" data-bind="click: function () {return true;}, clickBubble: false, text: title, attr: { href: url,target: '_blank' }"></a>
+                    </td>
+                    <td colspan = "2" class="col-md-1">
+                        <a data-bind="text: repositoryName, attr: { href: repositoryUrl,target: '_blank' }"></a>
+                    </td>
+                    <td colspan = "2" class="col-md-2" data-bind="text: creationDateToText"></td>
+                    <td colspan = "2" class="col-md-2" data-bind="text: updateToText"></td>
+                    <td colspan = "2" class="col-md-2">
+                        <a data-bind="text: statusName, attr: { href: issueUrl, target: '_blank'}"></a>
+                    </td>
+                    <td colspan = "2" class="col-md-1"><img data-bind="attr:{ src: priorityIconUrl, title:priorityName, alt:priorityName}" /></td>
+                    <td colspan = "2" class="col-md-1"><img data-bind="attr:{ src: issueTypeIconUrl, title:issueTypeName, alt:issueTypeName}" /></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-xs-2">
+            <input class="form-control" placeholder="Count records" data-bind="value: countRecords" />
+        </div>
+
+        <div class="btn-group" data-toggle="buttons" data-bind="foreach: numberOfPagesButton">
+            <label class="btn btn-success" data-bind="click: $parent.setPage">
+                <input type="radio" name="options" />
+                <span data-bind="text: num"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" data-bind="with: chosenPullRequest">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                    <h4 class="modal-title" data-bind="text: title"></h4>
+                </div>
+                <div class="modal-body">
+                    <p class="text-info" data-bind="text:description"></p>
+                    <p>
+                        <span class="text-success" data-bind="text: $parent.title.repository"></span>: <span class="text-info" data-bind="text: repositoryName"></span>
+                    </p>
+                    <p>
+                        <span class="text-success" data-bind="text: $parent.title.author"></span>: <span class="text-info" data-bind="text: createdByDisplayName"></span>
+                    </p>
+                    <p>
+                        <span class="text-success" data-bind="text: $parent.title.creationDate"></span>: <span class="text-info" data-bind="text: creationDateToText"></span>
+                    </p>
+                    <p>
+                        <span class="text-success" data-bind="text: $parent.title.mergeStatus"></span>: <span class="text-info" data-bind="text: mergeStatus"></span>
+                    </p>
+                    <table class="table">
+                        <caption>Reviewers</caption>
+                        <thead>
+                            <tr>
+                                <th>Display Name</th>
+                                <th>Title Vote</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: reviewers">
+                            <tr>
+                                <td data-bind="text: displayName"></td>
+                                <td data-bind="text: titleVote"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table">
+                        <caption>
+                            Commits (top 10)
+                            <p class="text-right text-info floatRigth">
+                                <span data-bind="text: sourceRefName"></span>
+                                <span class="glyphicon glyphicon-share-alt"></span>
+                                <span data-bind="text: targetRefName"></span>
+                            </p>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th>Push date</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: commits()">
+                            <tr>
+                                <td data-bind="text: pushDateToText"></td>
+                                <td data-bind="text: comment"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table">
+                        <caption>Builds</caption>
+                        <thead>
+                            <tr>
+                                <th>buildTypeId</th>
+                                <th>state</th>
+                                <th>status</th>
+                                <th>Status text</th>
+                                <th>Start date</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: builds">
+                            <tr>
+                                <td>
+                                    <a data-bind="text: buildTypeId, attr: { href: webUrl,target: '_blank'}"></a>
+                                </td>
+                                <td data-bind="text: state"></td>
+                                <td data-bind="text: status"></td>
+                                <td data-bind="text: statusText"></td>
+                                <td data-bind="text: startDate"></td>
+                                <td data-bind="text: time"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<!--<button class="btn btn-primary" data-toggle="modal" data-target="#modalStatistic">Статистика</button>-->
+<!--<div class="modal fade" id="modalStatistic" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                <h4 class="modal-title">Статистика</h4>
+            </div>
+            <div class="modal-body" data-bind="with: statisticsViewModel">
+
+                <div data-bind="template: { if: isLoaded, name: viewName, data: data }"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>-->

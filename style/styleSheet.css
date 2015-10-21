@@ -1,0 +1,15 @@
+﻿div {
+    padding-top: 10px;
+}
+body {
+    padding-top: 80px;
+    padding-bottom: 20px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.floatRigth {
+    float: right;
+}
+.thtop {
+    vertical-align: top !important;
+}
