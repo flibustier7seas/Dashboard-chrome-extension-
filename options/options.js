@@ -2,9 +2,9 @@ $(function() {
 	chrome.storage.sync.get(
 		{
 			login: "",
-			tfsUrl:"http://uk-tfs02.2gis.local:80/tfs/",
-			jiraUrl:"https://jira.2gis.ru",
-			teamCityUrl:"http://uk-erm-build03"
+			tfsUrl:"",
+			jiraUrl:"",
+			teamCityUrl:""
 		}, 
 		function(items) {
 			$("#login").val(items.login);
