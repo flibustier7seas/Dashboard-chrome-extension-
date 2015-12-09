@@ -70,11 +70,11 @@
             { title: tr.filter_ShowAll, isActive: ko.observable(false), filter: null },
             { title: tr.filter_StatusNoVote, isActive: ko.observable(false), filter: function (item) 
 				{ 
-					return item.titleMinVote() == 'No vote'; 
+					return item.minVote() === 0; 
 				} 
 			},
-            { title: tr.filter_StatusYes, isActive: ko.observable(false), filter: function (item) { return item.titleMinVote() == 'Yes'; } },
-            { title: tr.filter_StatusNo, isActive: ko.observable(false), filter: function (item) { return item.titleMinVote() == 'No'; } },
+            { title: tr.filter_StatusYes, isActive: ko.observable(false), filter: function (item) { return item.minVote() > 0; } },
+            { title: tr.filter_StatusNo, isActive: ko.observable(false), filter: function (item) { return item.minVote() < 0; } },
             { title: tr.filter_MyPullRequest, isActive: ko.observable(false), filter: function (item) { 
 					return item.createdByLogin().toLowerCase() == userLogin.toLowerCase(); 
 				} 
