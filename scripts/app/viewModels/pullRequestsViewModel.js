@@ -1,5 +1,6 @@
 ﻿define(["jquery", "ko", "i18n!nls/tr"], function ($, ko, tr) {
     return function (repositories, userLogin, loader, setFilterIndex, defaultFilter) {
+		// TODO: Избавиться от этого
         var self = this;
 		
 		this.setFilterIndex = setFilterIndex;

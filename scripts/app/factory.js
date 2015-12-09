@@ -1,7 +1,7 @@
 ﻿define(["jquery", "ko", "./utils", "./models/pullRequest", "./models/commit", "./models/reviewer", "./models/build", "./models/repository","./viewModels/pullRequestViewModel"],
     function ($, ko, utils, pullRequestModel, commit, reviewerModel, build, repositoryModel, pullRequestViewModel) {
 
-        var issueReg = new RegExp("[A-Z]+-\\d{4}", "i");
+        var issueReg = new RegExp("[A-Z]+-\\d+", "i");
 
         return function (tfs, tc, jira) {
 

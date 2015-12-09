@@ -4,20 +4,17 @@
         this.id = id;
         this.vote = vote;
         this.login = login;
-        this.titleVote = "";
-
-        this.updateTitleVote = function () {
-            if (vote == -10) {
-                this.titleVote = "No";
-            }
-            if (vote == 0) {
-                this.titleVote = "No vote";
-            }
-            if (vote == 10) {
-                this.titleVote = "Yes";
-            }
-        };
-
-        this.updateTitleVote();
+        this.titleVote = getTitleVote(vote);
+		
+		function getTitleVote(vote){
+			switch (vote){
+				case -10: return "Rejected";
+				case -5: return "Waiting for the author";
+				case 0: return "No vote";
+				case 5: return "Approved with suggestions";
+				case 10: return "Approved";
+			}
+            return "";
+		}
     };
 });

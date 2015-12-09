@@ -18,9 +18,9 @@
                 asc = true;
             }
             if (asc) {
-                return function (a, b) { return a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : a[property] == b[property] ? 0 : 0; }
+                return function (a, b) { return a[property] < b[property] ? -1 : a[property] > b[property] ? 1 :  0; }
             } else {
-                return function (a, b) { return a[property] > b[property] ? -1 : a[property] < b[property] ? 1 : a[property] == b[property] ? 0 : 0; };
+                return function (a, b) { return a[property] > b[property] ? -1 : a[property] < b[property] ? 1 :  0; };
             }
         },
         dateToText: function (date) {
