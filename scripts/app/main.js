@@ -1,13 +1,13 @@
 ﻿define(["jquery", "ko", "./viewModels/appViewModel", "./viewModels/pullRequestsViewModel", "./viewModels/statisticsViewModel",
-    "./server/jiraсmds", "./server/teamСityсmds", "./server/tfsсmds", "./viewLoader", "moment", "./factory","./storageService"],
-    function ($, ko, appViewModel, pullRequestsViewModel, statisticsViewModel, jiracmds, teamСityсmds, tfscmds, viewLoader, moment, factory,storageService) {
-        $(function () {
-            moment.locale(window.navigator.language);
-			
+	"./server/jiraсmds", "./server/teamСityсmds", "./server/tfsсmds", "./viewLoader", "moment", "./factory", "./storageService"],
+	function ($, ko, appViewModel, pullRequestsViewModel, statisticsViewModel, jiracmds, teamСityсmds, tfscmds, viewLoader, moment, factory, storageService) {
+		$(function () {
+			moment.locale(window.navigator.language);
+
 			var setFilterIndex = storageService.setFilterIndex;
-			
-			storageService.getSettings(function(settings){
-			
+
+			storageService.getSettings(function (settings) {
+
 				var app = new appViewModel(settings.login);
 
 				var jira = new jiracmds(settings.jiraUrl);
@@ -24,9 +24,17 @@
 					active: ko.observable(true)
 				};
 
-				tfs.getRepositories().then(function (data) {
+				tfs.getRepositories().then(function (repositories) {
+					var allPullRequests = ko.observableArray();
+					allPullRequests.extend({ rateLimit: 500 });
 
-					pullRequestsItem.data = new pullRequestsViewModel(data, settings.login, loader, setFilterIndex, settings.defaultFilter);
+					repositories.forEach(function (repository) {
+						loader.getPullRequests(repository).then(function (items) {
+							ko.utils.arrayPushAll(allPullRequests, items);
+						}.bind(this));
+					}.bind(this));
+
+					pullRequestsItem.data = new pullRequestsViewModel(allPullRequests, settings.login, setFilterIndex, settings.defaultFilter);
 
 					viewLoader.loadView("pullRequestsView", function () {
 
@@ -36,10 +44,10 @@
 				});
 
 				ko.applyBindings(app);
-			
-			}); 
-        });
-    });
+
+			});
+		});
+	});
 
 //var statisticsItem = {
 //    data: new statisticsViewModel(pullRequests),
